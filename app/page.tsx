@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Chatbot from "@/components/chatbot"
 import { listProducts } from "@/services/productService";
 import { ProductGrid } from "@/components/products/ProductGrid";
 import type { ProductLite } from "@/components/products/ProductCard";
@@ -116,6 +117,7 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+      <Chatbot />
     </>
   );
 }
