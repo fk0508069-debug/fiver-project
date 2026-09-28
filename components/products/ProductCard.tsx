@@ -96,18 +96,7 @@ export function ProductCard({ product }: { product: ProductLite }) {
           </div>
         </div>
       </Link>
-      <div className="grid grid-cols-2 gap-2 border-t border-line p-3">
-        <Link href={href} className="btn btn-ghost btn-sm">
-          Details
-        </Link>
-        <button
-          onClick={handleAdd}
-          disabled={outOfStock || adding}
-          className="btn btn-primary btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {adding ? "Added ✓" : outOfStock ? "Sold out" : "Add to cart"}
-        </button>
-      </div>
+     
     </article>
   );
 }
