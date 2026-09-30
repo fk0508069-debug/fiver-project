@@ -243,6 +243,13 @@ export default function CustomerSupport({
     if (tab === "support") setUnreadSupport(0);
   }, [tab]);
 
+  // If user logs out, reset to AI tab
+  useEffect(() => {
+    if (!isLoggedIn && tab === "support") {
+      setTab("ai");
+    }
+  }, [isLoggedIn, tab]);
+
   useEffect(() => {
     aiEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [aiMessages, aiLoading, tab]);
@@ -286,7 +293,6 @@ export default function CustomerSupport({
       });
       if (!cancelled && res.ok) {
         const id = res.data?.conversation?._id;
-        // Only set if it's a valid string, preventing "undefined" from being passed
         if (typeof id === "string" && id !== "undefined" && id !== "null") {
           setConversationId(id);
         } else {
@@ -303,7 +309,6 @@ export default function CustomerSupport({
   // Support: fetch thread
   // ----------------------------------------------------------
   const fetchSupportThread = useCallback(async () => {
-    // Prevent polling if conversationId is invalid
     if (!conversationId || conversationId === "undefined" || conversationId === "null") {
       return;
     }
@@ -536,6 +541,10 @@ export default function CustomerSupport({
   // ============================================================
   // RENDER
   // ============================================================
+
+  // If the user is not logged in, hide the entire chat widget
+  if (!isLoggedIn) return null;
+
   return (
     <>
       {/* FLOATING TOGGLE BUTTON */}
@@ -606,7 +615,7 @@ export default function CustomerSupport({
             {tab === "ai" ? "AI Answers" : "Customer Support"}
           </h2>
 
-          {/* TAB SWITCHER — always shows both tabs */}
+          {/* TAB SWITCHER — only shows Support tab if logged in */}
           <div className="mt-4 flex w-full items-center gap-1 border-b border-gray-100 px-3">
             <button
               type="button"
@@ -624,26 +633,28 @@ export default function CustomerSupport({
               )}
             </button>
 
-            <button
-              type="button"
-              onClick={() => setTab("support")}
-              className={`relative flex flex-1 items-center justify-center gap-1.5 rounded-t-lg px-3 py-2 text-xs font-medium transition ${
-                tab === "support"
-                  ? "text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <HeadsetIcon className="h-3.5 w-3.5" />
-              Support
-              {isLoggedIn && unreadSupport > 0 && tab !== "support" && (
-                <span className="ml-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
-                  {unreadSupport}
-                </span>
-              )}
-              {tab === "support" && (
-                <span className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full bg-blue-600" />
-              )}
-            </button>
+            {isLoggedIn && (
+              <button
+                type="button"
+                onClick={() => setTab("support")}
+                className={`relative flex flex-1 items-center justify-center gap-1.5 rounded-t-lg px-3 py-2 text-xs font-medium transition ${
+                  tab === "support"
+                    ? "text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <HeadsetIcon className="h-3.5 w-3.5" />
+                Support
+                {isLoggedIn && unreadSupport > 0 && tab !== "support" && (
+                  <span className="ml-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+                    {unreadSupport}
+                  </span>
+                )}
+                {tab === "support" && (
+                  <span className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full bg-blue-600" />
+                )}
+              </button>
+            )}
           </div>
         </div>
 
@@ -750,256 +761,225 @@ export default function CustomerSupport({
         )}
 
         {/* ====================================================== */}
-        {/* SUPPORT TAB */}
+        {/* SUPPORT TAB (Only renders if logged in) */}
         {/* ====================================================== */}
-        {tab === "support" && (
+        {isLoggedIn && tab === "support" && (
           <>
-            {/* Guest — show login prompt */}
-            {!isLoggedIn ? (
-              <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
-                  <HeadsetIcon className="h-7 w-7 text-blue-500" />
-                </div>
-                <p className="mt-4 text-sm font-semibold text-gray-800">
-                  Please log in
-                </p>
-                <p className="mt-1 max-w-[240px] text-xs text-gray-500">
-                  Sign in to chat with our support team. Your conversation will be
-                  saved to your account.
-                </p>
-                <a
-                  href={loginHref}
-                  className="mt-5 rounded-full bg-blue-600 px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-95"
-                >
-                  Log in
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setTab("ai")}
-                  className="mt-3 text-[11px] font-medium text-gray-400 hover:text-gray-600"
-                >
-                  or ask the AI assistant →
-                </button>
-              </div>
-            ) : (
-              <>
-                {/* Logged-in support UI */}
-                <div className="flex-1 overflow-y-auto bg-white px-4 py-3">
-                  <div className="space-y-4">
-                    {supportMessages.length === 0 && (
-                      <div className="flex flex-col items-center justify-center pt-10 text-center">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
-                          <HeadsetIcon className="h-6 w-6 text-blue-500" />
-                        </div>
-                        <p className="mt-3 text-sm font-medium text-gray-700">
-                          Need a hand?
-                        </p>
-                        <p className="mt-1 max-w-[240px] text-xs text-gray-500">
-                          Send us a message and a real human will reply as soon as
-                          possible.
-                        </p>
-                      </div>
-                    )}
-
-                    {supportMessages.map((m) => (
-                      <div
-                        key={m._id}
-                        className={`flex flex-col ${
-                          m.mine ? "items-end" : "items-start"
-                        }`}
-                      >
-                        {!m.mine && (
-                          <span className="mb-1 text-[11px] font-medium text-gray-400">
-                            {m.senderName || "Support"}
-                          </span>
-                        )}
-                        <div
-                          className={`max-w-[85%] px-3 py-2.5 text-sm leading-relaxed shadow-sm ${
-                            m.mine
-                              ? "rounded-2xl rounded-br-none bg-blue-600 text-white"
-                              : "rounded-2xl rounded-tl-none bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {m.attachments && m.attachments.length > 0 && (
-                            <div className="mb-1.5 grid grid-cols-2 gap-1.5">
-                              {m.attachments.map((a, ai) =>
-                                a.kind === "image" ? (
-                                  <Image
-                                    key={ai}
-                                    src={a.url}
-                                    alt={a.name}
-                                    width={176}
-                                    height={176}
-                                    unoptimized
-                                    onClick={() => setLightbox(a)}
-                                    className="max-h-44 cursor-zoom-in rounded-lg object-cover transition hover:opacity-90"
-                                  />
-                                ) : (
-                                  <a
-                                    key={ai}
-                                    href={a.url}
-                                    download={a.name}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className={`col-span-2 flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs ${
-                                      m.mine
-                                        ? "bg-white/15 hover:bg-white/25"
-                                        : "bg-white hover:bg-slate-50 border border-slate-200"
-                                    }`}
-                                  >
-                                    <FileIcon className="h-3.5 w-3.5 shrink-0" />
-                                    <span className="truncate">{a.name}</span>
-                                    <span className="ml-auto shrink-0 opacity-70">
-                                      {(a.size / 1024).toFixed(0)} KB
-                                    </span>
-                                  </a>
-                                )
-                              )}
-                            </div>
-                          )}
-
-                          {m.text && (
-                            <p className="whitespace-pre-wrap break-words">
-                              {m.text}
-                            </p>
-                          )}
-
-                          <div
-                            className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
-                              m.mine ? "text-white/70" : "text-gray-400"
-                            }`}
-                          >
-                            <span>
-                              {new Date(m.createdAt).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </span>
-                            {m.mine && !m._pending && (
-                              <DoubleCheckIcon className="h-3 w-3" />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    <div ref={supportEndRef} />
-                  </div>
-                </div>
-
-                {supportError && (
-                  <div className="flex items-center gap-2 border-t border-red-100 bg-red-50 px-4 py-2 text-[11px] text-red-600">
-                    <span className="flex-1">{supportError}</span>
-                    <button
-                      onClick={() => setSupportError(null)}
-                      className="text-red-400 hover:text-red-600"
-                    >
-                      ✕
-                    </button>
+            {/* Logged-in support UI */}
+            <div className="flex-1 overflow-y-auto bg-white px-4 py-3">
+              <div className="space-y-4">
+                {supportMessages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center pt-10 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
+                      <HeadsetIcon className="h-6 w-6 text-blue-500" />
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-gray-700">
+                      Need a hand?
+                    </p>
+                    <p className="mt-1 max-w-[240px] text-xs text-gray-500">
+                      Send us a message and a real human will reply as soon as
+                      possible.
+                    </p>
                   </div>
                 )}
 
-                <div className="mt-auto bg-white">
-                  <div className="h-[2px] w-full bg-gradient-to-r from-blue-200 via-pink-200 to-teal-200" />
-
-                  {pendingFiles.length > 0 && (
-                    <div className="flex flex-wrap gap-2 border-t border-gray-100 px-3 pt-3">
-                      {pendingFiles.map((p, i) => (
-                        <div
-                          key={i}
-                          className="group relative h-14 w-14 overflow-hidden rounded-lg border border-gray-200"
-                        >
-                          {p.previewUrl ? (
-                            <Image
-                              src={p.previewUrl}
-                              alt={p.name}
-                              width={56}
-                              height={56}
-                              unoptimized
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-gray-50">
-                              <FileIcon className="h-5 w-5 text-gray-400" />
-                            </div>
-                          )}
-                          {p.uploading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                            </div>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => removePending(i)}
-                            className="absolute -right-1 -top-1 hidden h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white group-hover:flex"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <form
-                    onSubmit={sendSupportMessage}
-                    className="flex items-end gap-2 p-3"
+                {supportMessages.map((m) => (
+                  <div
+                    key={m._id}
+                    className={`flex flex-col ${
+                      m.mine ? "items-end" : "items-start"
+                    }`}
                   >
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      accept="image/*,application/pdf,text/plain,.zip"
-                      className="hidden"
-                      onChange={onPickFiles}
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-                      title="Attach image"
-                      disabled={supportSending || uploading}
-                    >
-                      <PaperclipIcon className="h-4.5 w-4.5" />
-                    </button>
-
-                    <input
-                      type="text"
-                      value={supportInput}
-                      onChange={(e) => setSupportInput(e.target.value)}
-                      onKeyDown={handleSupportKeyDown}
-                      placeholder="Message support…"
-                      disabled={supportSending}
-                      className="flex-1 border-none bg-transparent py-2 text-sm text-gray-800 outline-none placeholder-gray-400 focus:ring-0"
-                    />
-
-                    <button
-                      type="submit"
-                      disabled={
-                        supportSending ||
-                        uploading ||
-                        (!supportInput.trim() &&
-                          preuploadedRef.current.length === 0)
-                      }
-                      className={`flex h-9 w-9 items-center justify-center rounded-full text-white transition-all ${
-                        (supportInput.trim() ||
-                          preuploadedRef.current.length > 0) &&
-                        !supportSending &&
-                        !uploading
-                          ? "bg-blue-600 hover:bg-blue-700 active:scale-95"
-                          : "bg-gray-200 cursor-not-allowed"
+                    {!m.mine && (
+                      <span className="mb-1 text-[11px] font-medium text-gray-400">
+                        {m.senderName || "Support"}
+                      </span>
+                    )}
+                    <div
+                      className={`max-w-[85%] px-3 py-2.5 text-sm leading-relaxed shadow-sm ${
+                        m.mine
+                          ? "rounded-2xl rounded-br-none bg-blue-600 text-white"
+                          : "rounded-2xl rounded-tl-none bg-gray-100 text-gray-800"
                       }`}
-                      aria-label="Send message"
                     >
-                      {supportSending ? (
-                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      ) : (
-                        <SendIcon className="h-4 w-4" />
+                      {m.attachments && m.attachments.length > 0 && (
+                        <div className="mb-1.5 grid grid-cols-2 gap-1.5">
+                          {m.attachments.map((a, ai) =>
+                            a.kind === "image" ? (
+                              <Image
+                                key={ai}
+                                src={a.url}
+                                alt={a.name}
+                                width={176}
+                                height={176}
+                                unoptimized
+                                onClick={() => setLightbox(a)}
+                                className="max-h-44 cursor-zoom-in rounded-lg object-cover transition hover:opacity-90"
+                              />
+                            ) : (
+                              <a
+                                key={ai}
+                                href={a.url}
+                                download={a.name}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`col-span-2 flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs ${
+                                  m.mine
+                                    ? "bg-white/15 hover:bg-white/25"
+                                    : "bg-white hover:bg-slate-50 border border-slate-200"
+                                }`}
+                              >
+                                <FileIcon className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate">{a.name}</span>
+                                <span className="ml-auto shrink-0 opacity-70">
+                                  {(a.size / 1024).toFixed(0)} KB
+                                </span>
+                              </a>
+                            )
+                          )}
+                        </div>
                       )}
-                    </button>
-                  </form>
-                </div>
-              </>
+
+                      {m.text && (
+                        <p className="whitespace-pre-wrap break-words">
+                          {m.text}
+                        </p>
+                      )}
+
+                      <div
+                        className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${
+                          m.mine ? "text-white/70" : "text-gray-400"
+                        }`}
+                      >
+                        <span>
+                          {new Date(m.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                        {m.mine && !m._pending && (
+                          <DoubleCheckIcon className="h-3 w-3" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div ref={supportEndRef} />
+              </div>
+            </div>
+
+            {supportError && (
+              <div className="flex items-center gap-2 border-t border-red-100 bg-red-50 px-4 py-2 text-[11px] text-red-600">
+                <span className="flex-1">{supportError}</span>
+                <button
+                  onClick={() => setSupportError(null)}
+                  className="text-red-400 hover:text-red-600"
+                >
+                  ✕
+                </button>
+              </div>
             )}
+
+            <div className="mt-auto bg-white">
+              <div className="h-[2px] w-full bg-gradient-to-r from-blue-200 via-pink-200 to-teal-200" />
+
+              {pendingFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 border-t border-gray-100 px-3 pt-3">
+                  {pendingFiles.map((p, i) => (
+                    <div
+                      key={i}
+                      className="group relative h-14 w-14 overflow-hidden rounded-lg border border-gray-200"
+                    >
+                      {p.previewUrl ? (
+                        <Image
+                          src={p.previewUrl}
+                          alt={p.name}
+                          width={56}
+                          height={56}
+                          unoptimized
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gray-50">
+                          <FileIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                      )}
+                      {p.uploading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removePending(i)}
+                        className="absolute -right-1 -top-1 hidden h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white group-hover:flex"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <form
+                onSubmit={sendSupportMessage}
+                className="flex items-end gap-2 p-3"
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,application/pdf,text/plain,.zip"
+                  className="hidden"
+                  onChange={onPickFiles}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                  title="Attach image"
+                  disabled={supportSending || uploading}
+                >
+                  <PaperclipIcon className="h-4.5 w-4.5" />
+                </button>
+
+                <input
+                  type="text"
+                  value={supportInput}
+                  onChange={(e) => setSupportInput(e.target.value)}
+                  onKeyDown={handleSupportKeyDown}
+                  placeholder="Message support…"
+                  disabled={supportSending}
+                  className="flex-1 border-none bg-transparent py-2 text-sm text-gray-800 outline-none placeholder-gray-400 focus:ring-0"
+                />
+
+                <button
+                  type="submit"
+                  disabled={
+                    supportSending ||
+                    uploading ||
+                    (!supportInput.trim() &&
+                      preuploadedRef.current.length === 0)
+                  }
+                  className={`flex h-9 w-9 items-center justify-center rounded-full text-white transition-all ${
+                    (supportInput.trim() ||
+                      preuploadedRef.current.length > 0) &&
+                    !supportSending &&
+                    !uploading
+                      ? "bg-blue-600 hover:bg-blue-700 active:scale-95"
+                      : "bg-gray-200 cursor-not-allowed"
+                  }`}
+                  aria-label="Send message"
+                >
+                  {supportSending ? (
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <SendIcon className="h-4 w-4" />
+                  )}
+                </button>
+              </form>
+            </div>
           </>
         )}
       </div>
