@@ -23,7 +23,7 @@ function LoginForm() {
 
   const reason = searchParams.get("reason");
   const reasonMsg = reason ? REASON_MESSAGES[reason] : null;
-  const next = searchParams.get("next") || "/account";
+  const next = searchParams.get("next") || "/";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

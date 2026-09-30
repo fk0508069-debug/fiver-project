@@ -1,21 +1,30 @@
 import Image from "next/image";
 import Link from "next/link";
-import Chatbot from "@/components/chatbot"
+import { cookies } from "next/headers";
+import Chatbot from "@/components/chatbot";
 import { listProducts } from "@/services/productService";
 import { ProductGrid } from "@/components/products/ProductGrid";
 import type { ProductLite } from "@/components/products/ProductCard";
 
 export const revalidate = 120;
 
+async function isLoggedIn(): Promise<boolean> {
+  const store = await cookies();
+  return Boolean(store.get("customer_session")?.value);
+}
+
 export default async function HomePage() {
-  const [featured, newArrivals, bestSellers] = await Promise.all([
+  const [featured, newArrivals, bestSellers, loggedIn] = await Promise.all([
     listProducts({ featured: true, limit: 4, activeOnly: true, inStockOnly: false }),
     listProducts({ limit: 4, sort: "newest", activeOnly: true }),
     listProducts({ limit: 4, sort: "popular", activeOnly: true }),
+    isLoggedIn(),
   ]);
 
   return (
     <>
+      {loggedIn && <Chatbot />}
+
       {/* HERO — theme preserved, e-commerce messaging */}
       <section className="overflow-hidden pb-16 pt-14">
         <div className="container-x grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
@@ -117,7 +126,6 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
-      <Chatbot />
     </>
   );
 }
