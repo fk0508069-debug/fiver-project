@@ -69,7 +69,7 @@ export async function createCustomer(input: {
   fullName: string;
   phone?: string;
 }) {
-  await connectDB();
+  await connectDB ();
   const email = input.email.trim().toLowerCase();
 
   const existing = await Customer.findOne({ email });
@@ -91,7 +91,7 @@ export async function createCustomer(input: {
 }
 
 export async function verifyCustomerCredentials(email: string, password: string) {
-  await connectDB();
+  await connectDB ();
   const normalized = email.trim().toLowerCase();
 
   const customer = await Customer.findOne({ email: normalized });

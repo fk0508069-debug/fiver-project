@@ -13,7 +13,7 @@ async function main() {
     process.exit(1);
   }
 
-  await connectDB();
+  await connectDB ();
   console.log("Connected to MongoDB");
 
   const existing = await Admin.findOne({ email });

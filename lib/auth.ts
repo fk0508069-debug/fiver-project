@@ -61,7 +61,7 @@ export async function verifyAdminCredentials(email: string, password: string) {
   const normalized = email.trim().toLowerCase();
 
   // 1. Try database first
-  await connectDB();
+  await connectDB ();
   const admin = await Admin.findOne({ email: normalized });
   if (admin) {
     const ok = await bcrypt.compare(password, admin.passwordHash);

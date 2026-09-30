@@ -47,7 +47,7 @@ export type ListParams = {
 };
 
 export async function listProducts(params: ListParams = {}) {
-  await connectDB();
+  await connectDB ();
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(48, Math.max(1, params.limit ?? 12));
   const skip = (page - 1) * limit;
@@ -89,19 +89,19 @@ export async function listProducts(params: ListParams = {}) {
 }
 
 export async function getProductById(id: string) {
-  await connectDB();
+  await connectDB ();
   const p = await Product.findById(id).lean();
   return p ? serializeProduct(p) : null;
 }
 
 export async function getProductBySlug(slug: string) {
-  await connectDB();
+  await connectDB ();
   const p = await Product.findOne({ slug, active: true }).lean();
   return p ? serializeProduct(p) : null;
 }
 
 export async function getRelatedProducts(productId: string, category: string, limit = 4) {
-  await connectDB();
+  await connectDB ();
   const items = await Product.find({ _id: { $ne: productId }, category, active: true })
     .sort({ sold: -1 })
     .limit(limit)
@@ -110,7 +110,7 @@ export async function getRelatedProducts(productId: string, category: string, li
 }
 
 export async function searchProducts(q: string, limit = 20) {
-  await connectDB();
+  await connectDB ();
   const term = q.trim();
   if (!term) return [];
 
@@ -137,7 +137,7 @@ export async function searchProducts(q: string, limit = 20) {
 }
 
 export async function getCategories() {
-  await connectDB();
+  await connectDB ();
   const rows = await Product.aggregate([
     { $match: { active: true } },
     { $group: { _id: "$category", count: { $sum: 1 } } },

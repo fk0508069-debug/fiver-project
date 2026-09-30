@@ -34,7 +34,7 @@ const products: Seed[] = [
 ];
 
 async function main() {
-  await connectDB();
+  await connectDB ();
   console.log("Connected to MongoDB");
 
   await Product.deleteMany({});

@@ -12,7 +12,7 @@ export async function GET(
 ) {
   const { res } = await requireAdmin();
   if (res) return res;
-  await connectDB();
+  await connectDB ();
 
   const { id } = await params;
   const product = await Product.findById(id).lean();
@@ -26,7 +26,7 @@ export async function PATCH(
 ) {
   const { res } = await requireAdmin();
   if (res) return res;
-  await connectDB();
+  await connectDB ();
 
   const { id } = await params;
   const body = await req.json().catch(() => null);
@@ -46,7 +46,7 @@ export async function DELETE(
 ) {
   const { res } = await requireAdmin();
   if (res) return res;
-  await connectDB();
+  await connectDB ();
 
   const { id } = await params;
   const product = await Product.findByIdAndUpdate(id, { active: false }, { new: true }).lean();

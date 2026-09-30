@@ -17,7 +17,7 @@ export default async function EditProductPage({
   const { id } = await params;
   if (!/^[0-9a-fA-F]{24}$/.test(id)) notFound();
 
-  await connectDB();
+  await connectDB ();
   const p = await Product.findById(id).lean();
   if (!p) notFound();
 

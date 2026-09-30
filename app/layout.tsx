@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { CartProvider } from "@/lib/cart-context";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import CustomerSupportMount from "@/components/CustomerSupportMount";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap" });
@@ -32,6 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Header />
             <main id="main">{children}</main>
             <Footer />
+
+            <CustomerSupportMount />
           </CartProvider>
         </AuthProvider>
       </body>

@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 export async function GET(req: Request) {
   const { res } = await requireAdmin();
   if (res) return res;
-  await connectDB();
+  await connectDB ();
 
   const url = new URL(req.url);
   const page = Math.max(1, Number(url.searchParams.get("page") ?? 1));
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const { res } = await requireAdmin();
   if (res) return res;
-  await connectDB();
+  await connectDB ();
 
   const body = await req.json().catch(() => null);
   const parsed = productUpsertSchema.safeParse(body);

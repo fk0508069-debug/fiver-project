@@ -11,7 +11,7 @@ export default async function AccountPage() {
   const session = await getCustomerSession();
   if (!session) redirect("/login?next=/account");
 
-  await connectDB();
+  await connectDB ();
   const ordersRaw = await Order.find({
     $or: [{ customerId: session.id }, { "customer.email": session.email }],
   })

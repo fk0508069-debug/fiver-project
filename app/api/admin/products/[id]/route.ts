@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { res } = await requireAdmin();
   if (res) return res;
-  await connectDB();
+  await connectDB ();
   const { id } = await params;
   const product = await Product.findById(id).lean();
   if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -19,7 +19,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { res } = await requireAdmin();
   if (res) return res;
-  await connectDB();
+  await connectDB ();
   const { id } = await params;
 
   const body = await req.json().catch(() => null);
@@ -34,7 +34,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { res } = await requireAdmin();
   if (res) return res;
-  await connectDB();
+  await connectDB ();
   const { id } = await params;
 
   const product = await Product.findByIdAndUpdate(id, { active: false }, { new: true }).lean();

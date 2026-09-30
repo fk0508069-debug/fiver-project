@@ -8,7 +8,7 @@ const globalWithMongoose = globalThis as unknown as { _mongo?: Cache };
 const cached: Cache = globalWithMongoose._mongo ?? { conn: null, promise: null };
 globalWithMongoose._mongo = cached;
 
-export async function connectDB() {
+ export async function  connectDB () {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {

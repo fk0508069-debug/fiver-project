@@ -35,7 +35,7 @@ export default async function AdminProductsPage({
     redirect("/admin/login");
   }
 
-  await connectDB();
+  await connectDB ();
 
   const sp = await searchParams;
 

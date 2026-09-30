@@ -14,7 +14,7 @@ export class OrderError extends Error {
 }
 
 export async function createOrder(input: CheckoutInput, customerId: string | null = null) {
-  await connectDB();
+  await connectDB ();
 
   const ids = input.items.map((i) => i.productId);
   const products = await Product.find({ _id: { $in: ids }, active: true });
@@ -113,7 +113,7 @@ export async function createOrder(input: CheckoutInput, customerId: string | nul
 }
 
 export async function getOrderByTracking(tracking: string) {
-  await connectDB();
+  await connectDB ();
   return Order.findOne({ trackingNumber: tracking.toUpperCase() }).lean();
 }
 
@@ -125,7 +125,7 @@ export async function listOrders(params: {
   from?: string;
   to?: string;
 }) {
-  await connectDB();
+  await connectDB ();
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(100, Math.max(1, params.limit ?? 20));
 
@@ -158,7 +158,7 @@ export async function updateOrderStatus(
   status: (typeof ORDER_STATUSES)[number],
   paymentStatus?: "unpaid" | "paid" | "refunded"
 ) {
-  await connectDB();
+  await connectDB ();
   const update: Record<string, unknown> = {
     status,
     $push: { timeline: { status, at: new Date() } },
@@ -168,7 +168,7 @@ export async function updateOrderStatus(
 }
 
 export async function getDashboardStats() {
-  await connectDB();
+  await connectDB ();
   const [agg] = await Order.aggregate([
     {
       $facet: {

@@ -13,6 +13,8 @@ const CustomerSchema = new Schema(
       postalCode: { type: String, default: "" },
     },
     lastLoginAt: Date,
+    // NEW — presence for support chat
+    lastPingAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
