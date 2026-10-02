@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const FASTAPI_URL =
-  process.env.FASTAPI_URL || "https://ai-chatbot-tau-blush-47.vercel.app";
+  process.env.FASTAPI_URL || "https://ailanggraph-fiver-demo.vercel.app";
 
 export async function POST(request: NextRequest) {
   try {
