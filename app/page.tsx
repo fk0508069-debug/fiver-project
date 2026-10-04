@@ -49,22 +49,7 @@ export default async function HomePage() {
       {/* =========================================================
           TRUST
       ========================================================== */}
-      <section className="border-y border-line py-14">
-        <div className="container-x text-center">
-          <p className="mx-auto max-w-[46ch] text-ink-muted">
-            Loved by teams at
-          </p>
-
-          <ul className="mt-8 flex flex-wrap justify-center gap-x-10 gap-y-6 font-display text-lg text-ink-faint">
-            <li>Northwind</li>
-            <li>Ridgeline</li>
-            <li>Verve Health</li>
-            <li>Anchorpoint</li>
-            <li>Solace Co.</li>
-            <li>Marlow Group</li>
-          </ul>
-        </div>
-      </section>
+ 
 
       {/* =========================================================
           FEATURED
@@ -74,9 +59,7 @@ export default async function HomePage() {
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="text-3xl">Featured</h2>
-              <p className="mt-2 text-ink-muted">
-                Handpicked pieces we think you&apos;ll love.
-              </p>
+              
             </div>
 
             <Link href="/products?featured=1" className="btn btn-ghost btn-sm">
