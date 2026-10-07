@@ -3,6 +3,7 @@ import { getAdminSession } from "@/lib/auth";
 import { getDashboardStats } from "@/services/orderService";
 import { KpiCard } from "@/components/admin/KpiCard";
 import { DashboardCharts } from "@/components/admin/DashboardCharts";
+import AdminLogoutButton from "@/components/AdminLogoutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,10 @@ export default async function AdminHome() {
       <header className="mb-8">
         <h1 className="text-3xl">Dashboard</h1>
         <p className="mt-2 text-ink-muted">A live snapshot of your store.</p>
+         <div className="flex items-center justify-between">
+      <h1 className="text-3xl font-bold"></h1>
+      <AdminLogoutButton />
+    </div>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -51,9 +51,17 @@ export async function setAdminCookie(token: string) {
   });
 }
 
+// lib/auth.ts
 export async function clearAdminCookie() {
   const store = await cookies();
-  store.set(COOKIE, "", { path: "/", maxAge: 0 });
+  store.set(COOKIE, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+    expires: new Date(0),   // belt + suspenders
+  });
 }
 
 /* ---------- Credential verification ---------- */

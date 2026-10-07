@@ -33,6 +33,14 @@ export async function GET() {
 }
 
 export async function DELETE() {
-  await clearAdminCookie();
-  return NextResponse.json({ ok: true });
+  const res = NextResponse.json({ ok: true, message: "Logged out" });
+  res.cookies.set("admin_session", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+    expires: new Date(0),
+  });
+  return res;
 }
